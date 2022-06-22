@@ -1,20 +1,5 @@
 # Docker image for Certbot with Clouflare DNS challenge
 
-## Usage
-
-Clone this repository
-
-```sh
-$ git clone https://github.com/PharmaceuticalDesign/docker-certbot-cloudflare.git
-$ cd docker-certbot-cloudflare
-```
-
-Build Docker image
-
-```sh
-$ docker build -t certbot-image .
-```
-
 Certificates will be located at /certs. This will also attempt to renew every 12 hours.
 
 ### Variables
