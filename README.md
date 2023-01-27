@@ -6,11 +6,11 @@ Certificates will be located at /certs. This will also attempt to renew every 12
 
 | Variables              | Description                    |
 |------------------------|--------------------------------|
-| CLOUDFLARE_API_TOKEN   | Your Cloudflare API token (DNS edit access, recommended!) |
-| CLOUDFLARE_EMAIL       | Your Cloudflare account email (not recommended) |
-| CLOUDFLARE_API_KEY     | Global API Key of your Cloudflare domain (not recommended)  |
-| DOMAIN                 | The domain(s) you need the SSL certs for, seperated by commas. |
-| EMAIL                  | Your email                    |
+| CLOUDFLARE_EMAIL       | Your Cloudflare account email |
+| CLOUDFLARE_API_TOKEN   | Your Cloudflare API token |
+| CLOUDFLARE_API_KEY     | Your Cloudflare Global API Key (NOT recommended)  |
+| DOMAIN                 | Domains for certificate requests, seperated by commas |
+| EMAIL                  | Email for certificate requests |
 
 ### Volumes
 /etc/letsencrypt/
