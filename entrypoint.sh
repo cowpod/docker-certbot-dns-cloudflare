@@ -11,19 +11,12 @@ if [[ ! -d /certs ]]; then
         exit 1
 fi
 
-if [[ "${CLOUDFLARE_API_TOKEN}" != "" ]]; then
+if [[ "${CLOUDFLARE_API_TOKEN}" == "" ]]; then
+	echo "CLOUDFLARE_API_TOKEN not set. This is required."
+	exit 2
+else
 	echo "CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}"
 	echo "dns_cloudflare_api_token=${CLOUDFLARE_API_TOKEN}" >> ~/cloudflare.ini
-else
-	echo "CLOUDFLARE_API_TOKEN not set. Trying CLOUDFLARE_EMAIL,CLOUDFLARE_API_KEY"
-	if [[ "${CLOUDFLARE_EMAIL}" == "" || "${CLOUDFLARE_API_KEY}" == "" ]]; then
-		echo "CLOUDFLARE_EMAIL,CLOUDFLARE_API_KEY variables are not set."
-		exit 2
-	fi
-	echo "CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}"
-	echo "CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}"
-	echo "dns_cloudflare_email=${CLOUDFLARE_EMAIL}" >> ~/cloudflare.ini
-	echo "dns_cloudflare_api_key=${CLOUDFLARE_API_KEY}" >> ~/cloudflare.ini
 fi
 
 if [[ "${DOMAIN}" == "" ]]; then
@@ -33,6 +26,10 @@ fi
 if [[ "${EMAIL}" == "" ]]; then
 	echo "EMAIL variable not set."
 	exit 4
+fi
+
+if [[ "${SLEEP_INTERVAL}" == "" ]]; then
+	echo "SLEEP_INTERVAL varaible not set. defaulting to 12h."
 fi
 
 certbot certonly --dns-cloudflare --dns-cloudflare-credentials ~/cloudflare.ini -d ${DOMAIN} --non-interactive --agree-tos -m ${EMAIL} | tee /var/log/certbot_status.log
@@ -60,10 +57,13 @@ for d in /etc/letsencrypt/live/*; do
 	cp --verbose -L "$d/fullchain.pem" "/certs/$domain.crt"
 done
 
-echo "Sleeping 12h before running again..."
-
-sleep 12h
+if [[ "${SLEEP_INTERVAL}" == "" ]]; then
+	echo "Sleeping 12h before running again..."
+	sleep 12h
+else
+	echo "Sleeping $SLEEP_INTERVAL before running again..."
+	sleep $SLEEP_INTERVAL
+fi
 
 /entrypoint.sh
 
-## /etc/letsencrypt/archive

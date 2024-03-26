@@ -6,14 +6,14 @@ Certificates will be located at /certs. This will also attempt to renew every 12
 
 | Variables              | Description                    |
 |------------------------|--------------------------------|
-| CLOUDFLARE_EMAIL       | Your Cloudflare account email |
 | CLOUDFLARE_API_TOKEN   | Your Cloudflare API token |
-| CLOUDFLARE_API_KEY     | Your Cloudflare Global API Key (NOT recommended)  |
+| EMAIL                  | Your email associated with certificates |
 | DOMAIN                 | Domains for certificate requests, seperated by commas |
-| EMAIL                  | Email for certificate requests |
+| SLEEP_INTERVAL         | Time in N[s|m|h] between renewal attempts. Defaults to 12h. |
 
-### Volumes
+### Volumes you'll need to bind
 /etc/letsencrypt/
+
 /certs
 
 ## Resources
