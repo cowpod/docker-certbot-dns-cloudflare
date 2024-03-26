@@ -5,20 +5,10 @@ set -e
 if [[ ! -d /etc/letsencrypt/live ]]; then
 	echo "Please ensure that /etc/letsencrypt is persistent! Or is this the first run?"
 fi
-
-if [[ ! -d /certs ]]; then
-        echo "Persistent /certs is required!"
-        exit 1
-fi
-
 if [[ "${CLOUDFLARE_API_TOKEN}" == "" ]]; then
 	echo "CLOUDFLARE_API_TOKEN not set. This is required."
 	exit 2
-else
-	echo "CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}"
-	echo "dns_cloudflare_api_token=${CLOUDFLARE_API_TOKEN}" >> ~/cloudflare.ini
 fi
-
 if [[ "${DOMAIN}" == "" ]]; then
 	echo "DOMAIN variable not set."
 	exit 3
@@ -28,42 +18,29 @@ if [[ "${EMAIL}" == "" ]]; then
 	exit 4
 fi
 
-if [[ "${SLEEP_INTERVAL}" == "" ]]; then
-	echo "SLEEP_INTERVAL varaible not set. defaulting to 12h."
+echo "$(date) running initial certbot command..."
+
+if [[ "$(whoami)" == "root" ]]; then
+	HOME_DIR=$( getent passwd "certbot" | cut -d: -f6 )
+	echo "runing as default certbot user... $HOME_DIR"
+
+	# user may have overriden with bad permisisons
+	chown -R certbot:certbot /etc/letsencrypt /var/lib/letsencrypt /var/log/letsencrypt
+
+	echo "dns_cloudflare_api_token=${CLOUDFLARE_API_TOKEN}" > "$HOME_DIR/cloudflare.ini"
+
+	chmod 600 "$HOME_DIR/cloudflare.ini"
+	chown certbot:certbot "$HOME_DIR/cloudflare.ini"
+
+	sudo -u certbot certbot certonly --dns-cloudflare --dns-cloudflare-credentials "$HOME_DIR/cloudflare.ini" -d ${DOMAIN} --non-interactive --agree-tos -m ${EMAIL}
 fi
 
-certbot certonly --dns-cloudflare --dns-cloudflare-credentials ~/cloudflare.ini -d ${DOMAIN} --non-interactive --agree-tos -m ${EMAIL} | tee /var/log/certbot_status.log
+echo "$(date) running crond in forefront... to change, overwrite /etc/letsencrypt/crontabs/certbot"
 
-echo "Copying generated certificates to /certs..."
-
-for d in /etc/letsencrypt/live/*; do
-	if [[ ! -d "$d" ]]; then
-		# not a directory
-		continue
-	fi
-
-	if [[ ! -f $d/privkey.pem ]]; then
-		echo "Couldn't find $d/privkey.pem!"
-		exit 5
-	fi
-
-	if [[ ! -f $d/fullchain.pem ]]; then
-		echo "Couldn't find $d/fullchain.pem!"
-		exit 6
-	fi
-
-	domain=$(basename $d)
-	cp --verbose -L "$d/privkey.pem" "/certs/$domain.key"
-	cp --verbose -L "$d/fullchain.pem" "/certs/$domain.crt"
-done
-
-if [[ "${SLEEP_INTERVAL}" == "" ]]; then
-	echo "Sleeping 12h before running again..."
-	sleep 12h
-else
-	echo "Sleeping $SLEEP_INTERVAL before running again..."
-	sleep $SLEEP_INTERVAL
+if [[ "$(whoami)" == "root" ]]; then
+	echo "running as default certbot user..."
+	sudo -u certbot crond -l 2 -f
 fi
 
-/entrypoint.sh
-
+echo "crond died...? sleeping"
+sleep infinity
