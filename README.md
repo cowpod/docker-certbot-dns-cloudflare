@@ -6,16 +6,20 @@ Attempts to renew every 12 hours
 
 ### Variables
 
-| Variables              | Description                    |
-|------------------------|--------------------------------|
-| CLOUDFLARE_API_TOKEN   | Your Cloudflare API token |
-| EMAIL                  | Your email associated with certificates |
-| DOMAIN                 | Domains for certificate requests, seperated by commas |
+| Variables              | Description                   |
+|------------------------|-------------------------------|
+| CLOUDFLARE_API_TOKEN   | Your Cloudflare API token     |
+| EMAIL                  | Your email                    |
+| DOMAIN                 | Domains seperated by commas   |
 
 ### Volumes you'll need to bind
-/etc/letsencrypt/
 
-/certs
+| Container Path        | Description                    |
+|-----------------------|--------------------------------|
+| /etc/letsencrypt/     | Required                       |
+| /var/lib/letsencrypt/ | Optional                       |
+| /var/log/letsencrypt/ | Optional                       |
+| /certs/               | Your certs will be placed here |
 
 ## Resources
 
