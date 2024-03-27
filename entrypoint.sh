@@ -52,7 +52,6 @@ else
 fi
 
 echo "$(date) running crond in forefront."
-echo "\tto change, overwrite /etc/letsencrypt/crontabs/certbot."
 
 if [[ "$(whoami)" == "root" ]]; then
 	echo "running as default user certbot"
