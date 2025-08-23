@@ -45,9 +45,11 @@ echo "$(date) running renewal script"
 
 if [[ "$(whoami)" == "root" ]]; then
 	echo "running as default user certbot"
+	chown certbot /renew.sh
 	sudo -u certbot /renew.sh
 else
 	echo "running as custom user $USER"
+	echo "you may encounter permission (ownership) issues with /renew.sh"
 	/renew.sh
 fi
 
