@@ -1,0 +1,17 @@
+services:
+  certbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - CLOUDFLARE_API_TOKEN=YOUR_CLOUDFLARE_API_TOKEN
+      - EMAIL=YOUR_EMAIL
+      - DOMAIN=DOMAINS_SEPARATED_BY_COMMAS
+    volumes:
+      - config:/etc/letsencrypt
+      - certs:/certs
+      
+volumes:
+  config:
+  certs:
